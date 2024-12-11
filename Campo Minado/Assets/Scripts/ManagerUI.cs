@@ -13,6 +13,20 @@ public class ManagerUI : MonoBehaviour
 
     [SerializeField] TextMeshProUGUI gameOverText;
 
+    private void OnEnable()
+    {
+
+        GameManager.instance.OnGameOver += OnGameOver;
+        GameManager.instance.OnVictory += OnVictory;
+    }
+
+    private void OnDisable()
+    {
+
+        GameManager.instance.OnGameOver -= OnGameOver;
+        GameManager.instance.OnVictory -= OnVictory;
+    }
+
     public void AtualizarBarra(float value)
     {
         barraDeDificuldade.fillAmount = value;
@@ -29,5 +43,15 @@ public class ManagerUI : MonoBehaviour
         {
             gameOverText.text = "Derrota";
         }
+    }
+
+    private void OnGameOver()
+    {
+        AtualizarTexto(false);
+    }
+
+    private void OnVictory()
+    {
+        AtualizarTexto(true);
     }
 }

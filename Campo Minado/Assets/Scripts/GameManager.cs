@@ -12,8 +12,15 @@ public class GameManager : MonoBehaviour
         instance = this;
     }
     #endregion
-    Area[,] areas;
 
+
+    public delegate void GameOverDelegate();
+    public delegate void VictoryDelegate();
+
+    public event GameOverDelegate OnGameOver;
+    public event VictoryDelegate OnVictory;
+
+    Area[,] areas;
     [SerializeField] GameObject AreaPrefab;
 
     int diametroDoCampo;
@@ -95,21 +102,21 @@ public class GameManager : MonoBehaviour
     {
         int quantidadeDeBombas = 0;
 
-        for (int i = -1;i < 2;i++)
+        for (int i = -1; i < 2; i++)
         {
-            for(int j = -1;j < 2; j++)
+            for (int j = -1; j < 2; j++)
             {
-                if (x+i < diametroDoCampo && y+j < diametroDoCampo && x+i >= 0 && y+j >= 0) 
+                if (x + i < diametroDoCampo && y + j < diametroDoCampo && x + i >= 0 && y + j >= 0)
                 {
                     if (areas[x + i, y + j].Bomba)
                     {
                         quantidadeDeBombas++;
-                    } 
+                    }
                 }
             }
         }
 
-        if(quantidadeDeBombas == 0)
+        if (quantidadeDeBombas == 0)
         {
             for (int i = -1; i < 2; i++)
             {
@@ -137,43 +144,46 @@ public class GameManager : MonoBehaviour
             index[0] = Random.Range(0, diametroDoCampo);
             index[1] = Random.Range(0, diametroDoCampo);
 
-            if (areas[index[0], index[1]].Bomba == false) 
+            if (areas[index[0], index[1]].Bomba == false)
             {
                 areas[index[0], index[1]].Bomba = true;
-                quantidadeDeBombas++; 
+                quantidadeDeBombas++;
             }
         }
     }
 
     public void GameOver()
     {
-        foreach(Area area in areas)
+        foreach (Area area in areas)
         {
             if (area.Bomba)
             {
                 area.RevelarBomba();
             }
-            
         }
 
         gameOver.SetActive(true);
         managerUI.AtualizarTexto(false);
+
+        OnGameOver?.Invoke();
     }
 
     public void ChecarVitoria()
     {
         int quantidadeNaoRevelados = 0;
-        foreach(Area area in areas)
+        foreach (Area area in areas)
         {
             if (!area.revelado)
             {
                 quantidadeNaoRevelados++;
             }
         }
-        if (quantidadeNaoRevelados == numeroDeBombas) 
+        if (quantidadeNaoRevelados == numeroDeBombas)
         {
             gameOver.SetActive(true);
             managerUI.AtualizarTexto(true);
+
+            OnVictory?.Invoke();
         }
     }
 }
